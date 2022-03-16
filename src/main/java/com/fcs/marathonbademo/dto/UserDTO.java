@@ -16,6 +16,7 @@ public class UserDTO {
     private int status;
     private Date createdAt;
     private Date updatedAt;
+    private String role;
 
     public UserDTO(User user) {
         this.id = user.getId();
@@ -25,5 +26,6 @@ public class UserDTO {
         this.status = user.getStatus();
         this.createdAt = user.getCreatedAt();
         this.updatedAt = user.getCreatedAt();
+        this.role = user.getRole().getName();
     }
 }

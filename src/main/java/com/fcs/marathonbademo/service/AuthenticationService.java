@@ -3,8 +3,10 @@ package com.fcs.marathonbademo.service;
 
 import com.fcs.marathonbademo.dto.AuthDTO;
 import com.fcs.marathonbademo.dto.UserDTO;
+import com.fcs.marathonbademo.entity.Role;
 import com.fcs.marathonbademo.entity.User;
 import com.fcs.marathonbademo.repository.GameCharacterRepository;
+import com.fcs.marathonbademo.repository.RoleRepository;
 import com.fcs.marathonbademo.repository.UserRepository;
 import com.fcs.marathonbademo.util.EtherUtil;
 import com.fcs.marathonbademo.util.JwtUtil;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class AuthenticationService {
     private final UserRepository userRepository;
     private final GameCharacterRepository gameCharacterRepository;
+    private final RoleRepository roleRepository;
 
     //get signature, messsage, public key if public key not exist -> register new user
     public ResponseEntity<?> loginAndRegister(AuthDTO authDTO) {
@@ -39,6 +42,15 @@ public class AuthenticationService {
         try {
             Optional<User> userByAddress = userRepository.findByAddress(publicKey);
             User toAuthenticateUser = null;
+            Role userRole = null;
+            Optional<Role> userRoleOptional = roleRepository.findByName("user");
+            if (!userRoleOptional.isPresent()) {
+                Role newRole = new Role();
+                newRole.setName("user");
+                userRole = roleRepository.save(newRole);
+            } else {
+                userRole = userRoleOptional.get();
+            }
             if (!userByAddress.isPresent()) {
                 //create new user
                 User newUser = new User();
@@ -46,6 +58,7 @@ public class AuthenticationService {
                 newUser.setCreatedAt(new Date());
                 newUser.setUpdatedAt(new Date());
                 newUser.setStatus(1);
+                newUser.setRole(userRole);
                 //save
                 toAuthenticateUser = userRepository.save(newUser);
 
@@ -54,7 +67,7 @@ public class AuthenticationService {
             }
             //gen jwt token
             String accessToken = JwtUtil.generateToken(toAuthenticateUser.getAddress(),
-                    null,
+                    toAuthenticateUser.getRole().getName(),
                     JwtUtil.ONE_DAY * 7);
 
             String refreshToken = JwtUtil.generateToken(toAuthenticateUser.getAddress(),

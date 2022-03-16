@@ -26,4 +26,11 @@ public class User {
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "user", fetch = FetchType.LAZY)
     private Set<GameCharacter> gameCharacters;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = "roleId")
+    private Role role;
+
+    @Column(insertable = false, updatable = false)
+    private int roleId;
+
 }
