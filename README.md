@@ -1,4 +1,4 @@
-# Marathon NFT Back end
+# Spirng boot authentication with web3 frontend use Sign message 
 Spring boot, MySql, Web3J
 # INSTALL
 
